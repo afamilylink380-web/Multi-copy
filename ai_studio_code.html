@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fluid Text Repeater — One UI Glass Edition</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --glass-bg: rgba(22, 27, 34, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-focus: rgba(0, 113, 227, 0.5);
+            --samsung-blue: #0b84ff;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition-fluid: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 113, 227, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.12) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 16px;
+        }
+
+        /* App Frame */
+        .app-frame {
+            width: 100%;
+            max-width: 420px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            animation: appEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes appEntry {
+            0% { opacity: 0; transform: translateY(20px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* App Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title-group h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .app-title-group p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 14px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition-fluid);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Distinct Card Blocks */
+        .card-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: var(--transition-fluid);
+        }
+
+        .card-block:focus-within {
+            border-color: var(--glass-border-focus);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 15px rgba(0, 113, 227, 0.15);
+        }
+
+        .block-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Text Input */
+        .text-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            resize: none;
+            min-height: 44px;
+            max-height: 90px;
+            line-height: 1.4;
+        }
+
+        .text-input::placeholder {
+            color: rgba(156, 163, 175, 0.4);
+        }
+
+        /* Slider Controls */
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .multiplier-value {
+            font-weight: 700;
+            color: var(--samsung-blue);
+            font-size: 0.85rem;
+            background: rgba(0, 113, 227, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            margin: 6px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        /* Action Buttons Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 8px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: var(--transition-fluid);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0071e3, #4facfe);
+            color: white;
+            box-shadow: 0 6px 16px rgba(0, 113, 227, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.97);
+        }
+
+        /* Output Viewport / Motion Box */
+        .output-card {
+            background: rgba(10, 13, 20, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 14px;
+            position: relative;
+            overflow: hidden;
+            min-height: 110px;
+            max-height: 160px;
+            display: flex;
+            align-items: center;
+        }
+
+        .output-scroller {
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 0.8rem;
+            color: #d1d5db;
+            line-height: 1.5;
+            position: relative;
+            width: max-content;
+        }
+
+        /* Slow Fluid Horizontal Motion Animation */
+        .animate-drift {
+            animation: slowHorizontalDrift 16s ease-in-out infinite;
+        }
+
+        @keyframes slowHorizontalDrift {
+            0% { transform: translateX(0px); }
+            45% { transform: translateX(50px); }
+            55% { transform: translateX(50px); }
+            100% { transform: translateX(0px); }
+        }
+
+        .output-placeholder {
+            color: rgba(156, 163, 175, 0.4);
+            font-size: 0.8rem;
+            text-align: center;
+            width: 100%;
+            font-style: italic;
+        }
+
+        /* Code Viewer Modal Drawer */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 480px;
+            max-height: 85vh;
+            background: #121824;
+            border: 1px solid var(--glass-border);
+            border-radius: 28px 28px 0 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .code-box {
+            width: 100%;
+            height: 280px;
+            background: #080b11;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: #93c5fd;
+            font-family: monospace;
+            font-size: 0.7rem;
+            padding: 12px;
+            resize: none;
+            outline: none;
+            line-height: 1.4;
+        }
+
+        /* Toast Popup */
+        .toast {
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 1100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-frame">
+        <!-- Header with Code Viewer Button -->
+        <div class="app-header">
+            <div class="app-title-group">
+                <h1>Fluid Repeater</h1>
+                <p>One UI Glass</p>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="viewCodeBtn">
+                    <i class="fa-solid fa-code"></i> Code
+                </button>
+            </div>
+        </div>
+
+        <!-- Text & Emoji Input Block -->
+        <div class="card-block">
+            <div class="block-label">
+                <span>Text & Emoji Input</span>
+                <i class="fa-regular fa-face-smile"></i>
+            </div>
+            <textarea id="textInput" class="text-input" placeholder="Type text or emojis...">Hello Android! ✨🤖</textarea>
+        </div>
+
+        <!-- Multiplier Block -->
+        <div class="card-block">
+            <div class="slider-header">
+                <span class="block-label" style="margin:0;">Repeat Count</span>
+                <span id="multiplierValue" class="multiplier-value">12</span>
+            </div>
+            <input type="range" id="multiplierSlider" min="1" max="100" value="12">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-grid">
+            <button class="btn btn-primary" id="generateBtn">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate
+            </button>
+            <button class="btn btn-secondary" id="copyBtn">
+                <i class="fa-regular fa-copy"></i> Copy
+            </button>
+        </div>
+
+        <!-- Output Motion Box -->
+        <div class="card-block" style="padding:0; overflow:hidden;">
+            <div style="padding: 10px 14px 0 14px; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                Fluid Output Feed (Line-by-Line)
+            </div>
+            <div class="output-card" id="outputContainer">
+                <div class="output-placeholder" id="placeholderText">Generated lines will drift fluidly here...</div>
+                <div class="output-scroller" id="outputScroller" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Floating Toast Message -->
+        <div class="toast" id="toastMessage">Action successful!</div>
+    </div>
+
+    <!-- Code Viewer Modal Drawer -->
+    <div class="modal-overlay" id="codeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>App Source Code</h3>
+                <button class="icon-btn" id="closeModalBtn">
+                    <i class="fa-solid fa-xmark"></i> Close
+                </button>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">You can review or copy the full single-file code directly from your phone:</p>
+            <textarea class="code-box" id="sourceCodeArea" readonly></textarea>
+            <button class="btn btn-primary" id="copyCodeBtn">
+                <i class="fa-regular fa-copy"></i> Copy Full Code
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const multiplierSlider = document.getElementById('multiplierSlider');
+        const multiplierValue = document.getElementById('multiplierValue');
+        const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const outputScroller = document.getElementById('outputScroller');
+        const placeholderText = document.getElementById('placeholderText');
+        const toastMessage = document.getElementById('toastMessage');
+
+        // Modal Elements
+        const viewCodeBtn = document.getElementById('viewCodeBtn');
+        const codeModal = document.getElementById('codeModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const sourceCodeArea = document.getElementById('sourceCodeArea');
+        const copyCodeBtn = document.getElementById('copyCodeBtn');
+
+        // Sync slider display value
+        multiplierSlider.addEventListener('input', (e) => {
+            multiplierValue.textContent = e.target.value;
+        });
+
+        let rawGeneratedText = "";
+
+        // Generate line-by-line text function
+        function handleGeneration() {
+            const text = textInput.value || "✨";
+            const count = parseInt(multiplierSlider.value, 10);
+
+            // CRITICAL REQUIREMENT: Line-by-line new lines separation
+            const linesArray = [];
+            for (let i = 0; i < count; i++) {
+                linesArray.push(text);
+            }
+            rawGeneratedText = linesArray.join('\n');
+
+            outputScroller.textContent = rawGeneratedText;
+            outputScroller.style.display = 'block';
+            placeholderText.style.display = 'none';
+
+            // Re-trigger slow fluid motion animation
+            outputScroller.classList.remove('animate-drift');
+            void outputScroller.offsetWidth; 
+            outputScroller.classList.add('animate-drift');
+        }
+
+        // Bulletproof Android-friendly copy helper
+        function copyTextToClipboard(textToCopy, successMsg) {
+            if (!textToCopy) {
+                showToast("Nothing to copy!");
+                return;
+            }
+
+            // Fallback method compatible with local file execution on Android browsers
+            const textarea = document.createElement("textarea");
+            textarea.value = textToCopy;
+            textarea.style.position = "fixed";  
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(successMsg);
+                } else {
+                    showToast("Copy failed, select manually.");
+                }
+            } catch (err) {
+                showToast("Copy error occurred.");
+            }
+
+            document.body.removeChild(textarea);
+        }
+
+        // Toast display utility
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toastMessage.classList.add('show');
+            setTimeout(() => {
+                toastMessage.classList.remove('show');
+            }, 2000);
+        }
+
+        // Event Listeners
+        generateBtn.addEventListener('click', handleGeneration);
+        copyBtn.addEventListener('click', () => {
+            copyTextToClipboard(rawGeneratedText, "Copied line-by-line output!");
+        });
+
+        // Code Modal Logic
+        viewCodeBtn.addEventListener('click', () => {
+            sourceCodeArea.value = document.documentElement.outerHTML;
+            codeModal.classList.add('open');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            codeModal.classList.remove('open');
+        });
+
+        codeModal.addEventListener('click', (e) => {
+            if (e.target === codeModal) codeModal.classList.remove('open');
+        });
+
+        copyCodeBtn.addEventListener('click', () => {
+            copyTextToClipboard(sourceCodeArea.value, "Full code copied successfully!");
+        });
+
+        // Auto-generate on start
+        window.addEventListener('DOMContentLoaded', () => {
+            handleGeneration();
+        });
+    </script>
+</body>
+</html>
